@@ -9,13 +9,16 @@
 
 
 		var self = this;
-		var tick = function() {
-			self.update();
-			self.draw(screen, gameSize);
-			requestAnimationFrame(tick);
-		}
+		loadSound("shoot.mp3", function(shootSound) {
+			self.shootSound = shootSound;
+			var tick = function() {
+				self.update();
+				self.draw(screen, gameSize);
+				requestAnimationFrame(tick);
+			}
 
-		tick();
+			tick();
+		});
 	};
 
 	Game.prototype = {
@@ -41,6 +44,14 @@
 
 		addBody: function(body) {
 			this.bodies.push(body);
+		},
+
+		invadersBelow: function(invader) {
+			return this.bodies.filter(function(b) {
+				return b instanceof Invader &&
+				 b.center.y > invader.center.y &&
+				 b.center.x - invader.center.x < invader.size.x;
+			}).length > 0;
 		}
 	};
 
@@ -63,6 +74,8 @@
 				var bullet = new Bullet({ x: this.center.x, y: this.center.y - this.size.x / 2},
 										{ x: 0, y: -6 });
 				this.game.addBody(bullet);
+				this.game.shootSound.load();
+				this.game.shootSound.play();
 			}
 		}
 	};
@@ -96,6 +109,12 @@
 
 			this.center.x += this.speedX;
 			this.patrolX += this.speedX;
+
+			if (Math.random() > 0.995 && !this.game.invadersBelow(this)) {
+				var bullet = new Bullet({ x: this.center.x, y: this.center.y + this.size.x / 2},
+										{ x: Math.random() - 0.5, y: 2 });
+				this.game.addBody(bullet);
+			};
 		}
 	};
 
@@ -140,6 +159,17 @@
 				 b1.center.x - b1.size.x / 2 > b2.center.x + b2.size.x / 2 ||
 				 b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2);
 	};
+
+	var loadSound = function(url, callback) {
+		var loaded = function() {
+			callback(sound);
+			sound.removeEventListener('canplaythrough', loaded);
+		};
+
+		var sound = new Audio(url);
+		sound.addEventListener('canplaythrough', loaded);
+		sound.load();
+	}
 
 	window.onload = function() {
 		new Game('screen');
