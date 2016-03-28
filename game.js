@@ -173,5 +173,11 @@
 
 	window.onload = function() {
 		new Game('screen');
+		
+		// var start = document.getElementById('start');
+		// start.addEventListener('click', function() {
+		// 	new Game('screen');
+		// });
+
 	};
 })();
