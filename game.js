@@ -30,6 +30,10 @@
 			for (var i = 0; i < this.bodies.length; i++) {
 				drawRect(screen, this.bodies[i]);
 			};
+		},
+
+		addBody: function(body) {
+			this.bodies.push(body);
 		}
 	};
 
@@ -47,6 +51,25 @@
 			} else if (this.Keyboarder.isDown(this.Keyboarder.KEYS.RIGHT)) {
 				this.center.x += 2;
 			}
+
+			if (this.Keyboarder.isDown(this.Keyboarder.KEYS.SPACE)) {
+				var bullet = new Bullet({ x: this.center.x, y: this.center.y - this.size.x / 2},
+										{ x: 0, y: -6 });
+				this.game.addBody(bullet);
+			}
+		}
+	};
+
+	var Bullet = function(center, velocity) {
+		this.size = { x: 3, y: 3 };
+		this.center = center;
+		this.velocity = velocity;
+	};
+
+	Bullet.prototype = {
+		update: function() {
+			this.center.x += this.velocity.x;
+			this.center.y += this.velocity.y;
 		}
 	};
 
