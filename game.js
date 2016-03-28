@@ -5,7 +5,7 @@
 		var screen = canvas.getContext('2d');
 		var gameSize = { x: canvas.width, y: canvas.height };
 
-		this.bodies = [new Player(this, gameSize)];
+		this.bodies = createInvaders(this).concat(new Player(this, gameSize));
 
 
 		var self = this;
@@ -72,6 +72,35 @@
 			this.center.y += this.velocity.y;
 		}
 	};
+
+	var Invader = function(game, center) {
+		this.game = game;
+		this.size = { x: 15, y: 15 };
+		this.center = center;
+		this.patrolX = 0;
+		this.speedX = 0.3;
+	};
+
+	Invader.prototype = {
+		update: function() {
+			if (this.patrolX < 0 || this.patrolX > 40) {
+				this.speedX = -this.speedX;
+			}
+
+			this.center.x += this.speedX;
+			this.patrolX += this.speedX;
+		}
+	};
+
+	var createInvaders = function(game) {
+		var invaders = [];
+		for (var i = 0; i < 24; i++) {
+			var x = 30 + (i % 8) * 30;
+			var y = 30 + (i % 3) * 30;
+			invaders.push(new Invader(game, { x: x, y: y }));
+		};
+		return invaders;
+	}
 
 	var drawRect = function(screen, body) {
 		screen.fillRect(body.center.x - body.size.x / 2,
